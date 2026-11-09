@@ -4,35 +4,47 @@
     "service_type": "Certificate",
     "applicant_label": "Citizen A",
     "burst_time": 3,
-    "state": "NEW",
-    "start_time": null,
-    "finish_time": null
+    "state": "TERMINATED",
+    "start_time": 0,
+    "finish_time": 3,
+    "arrival_time": 0,
+    "waiting_time": 0,
+    "turnaround_time": 3
   },
   {
     "request_id": "REQ-002",
     "service_type": "Identity",
     "applicant_label": "Citizen B",
     "burst_time": 2,
-    "state": "NEW",
-    "start_time": null,
-    "finish_time": null
+    "state": "TERMINATED",
+    "start_time": 3,
+    "finish_time": 5,
+    "arrival_time": 0,
+    "waiting_time": 3,
+    "turnaround_time": 5
   },
   {
     "request_id": "REQ-003",
     "service_type": "Grievance",
     "applicant_label": "Citizen C",
     "burst_time": 4,
-    "state": "NEW",
-    "start_time": null,
-    "finish_time": null
+    "state": "TERMINATED",
+    "start_time": 5,
+    "finish_time": 9,
+    "arrival_time": 0,
+    "waiting_time": 5,
+    "turnaround_time": 9
   },
   {
     "request_id": "REQ-004",
     "service_type": "Tax",
     "applicant_label": "Citizen D",
     "burst_time": 1,
-    "state": "NEW",
-    "start_time": null,
-    "finish_time": null
+    "state": "TERMINATED",
+    "start_time": 9,
+    "finish_time": 10,
+    "arrival_time": 0,
+    "waiting_time": 9,
+    "turnaround_time": 10
   }
 ]
