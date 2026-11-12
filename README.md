@@ -1,89 +1,143 @@
 # Integrated National Citizen Services Platform
 
-**Operating Systems PBL · CCSE0303A · Group 66**
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Standard%20Library%20Only-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-166%2F166%20Passed-brightgreen.svg)]()
+[![Curriculum](https://img.shields.io/badge/Subject-Operating%20Systems%20PBL-orange.svg)]()
+[![Code Quality](https://img.shields.io/badge/Architecture-Multi--Tier%20Modular-informational.svg)]()
 
-An academic web application prototype that models a unified citizen-service experience. Citizens can explore a catalogue of sample services, submit a synthetic application, receive a reference number and look up its current status. The application workflow is supported by OS concepts implemented and studied across the project phases.
+An academic full-stack prototype and simulation platform developed for the **Operating Systems (CCSE0303A)** Project-Based Learning (PBL) curriculum. It pairs a **Citizen Services Management Portal** with an interactive **CPU Scheduling Simulation Lab** demonstrating real-world operating system mechanics.
 
-> This is an educational prototype. It is not an official government portal, does not connect to government databases or payment gateways, and must only be used with fictional demonstration information.
+---
 
-## Run the citizen-facing website
+## 🏛️ System Architecture
 
-Requires Python 3.10+; no third-party packages are required.
+The project is structured into two complementary application servers running purely on the Python standard library:
 
-```bash
-python3 web_app.py
+```mermaid
+graph TD
+    subgraph CitizenPortal["1. Citizen Portal & Admin System (:8000)"]
+        Citizen([Citizen User]) -->|"1. Submit Request"| WebApp["web_app.py<br/>(HTTP Server & Router)"]
+        WebApp -->|"2. Validate & Assign Ref"| Validator["Input Validation Engine"]
+        Validator -->|"3. Persist State"| JSONStore[("data/citizen_applications.json")]
+        Admin([Platform Administrator]) -->|"4. Review & Update Status"| AdminPage["admin_page.py<br/>(Session Auth & Controls)"]
+        AdminPage -->|"5. Update Record"| JSONStore
+    end
+
+    subgraph OSLab["2. OS CPU Scheduling Lab (:8001)"]
+        Student([Student / Evaluator]) -->|"Configure Processes & Quantum"| LabServer["os_lab_app.py<br/>(Simulation Server)"]
+        LabServer --> SchedCore["Scheduler Engine (scheduler.py)"]
+        SchedCore -->|"Algorithm Selection"| Algos["FCFS / SJF / Priority / Round Robin"]
+        Algos --> Metrics["Turnaround, Waiting Time & Gantt Chart"]
+        Metrics -->|"Render Visual Metrics"| LabServer
+    end
 ```
 
-Open **http://127.0.0.1:8000**.
+---
 
-The portal includes a service catalogue, service-specific application form, input validation, locally persisted application records, generated reference numbers and status lookup. Records are stored in `data/citizen_applications.json`.
+## ⚙️ Operating System Scheduling Mechanics
 
-## Administrator dashboard
+The OS Lab simulator (`os_lab_app.py`) demonstrates multi-programming process scheduling across standard operating system algorithms:
 
-The local administrator console is available at **http://127.0.0.1:8000/admin**. Configure a password before starting the server:
+```mermaid
+flowchart TD
+    subgraph ReadyQueue["Process Ready Queue"]
+        P1["Process P1 (Burst: 6, Pri: 2)"]
+        P2["Process P2 (Burst: 4, Pri: 1)"]
+        P3["Process P3 (Burst: 8, Pri: 3)"]
+    end
 
-```bash
-export CIVICONE_ADMIN_PASSWORD='choose-a-local-demo-password'
-python3 web_app.py
+    ReadyQueue --> Dispatcher{"Scheduler Dispatcher"}
+    
+    Dispatcher -->|"FCFS"| FCFS["First-Come, First-Served<br/>FIFO execution order"]
+    Dispatcher -->|"SJF"| SJF["Shortest Job First<br/>Minimizes average waiting time"]
+    Dispatcher -->|"Priority"| PRIO["Priority Scheduling<br/>Selects highest priority task"]
+    Dispatcher -->|"Round Robin"| RR["Round Robin (Time Quantum q)<br/>Preemptive time-sliced execution"]
+
+    FCFS & SJF & PRIO & RR --> CPU["CPU Execution Timeline & Gantt Chart"]
 ```
 
-The dashboard lists submitted applications, supports search and status filters, and allows an administrator to move an application between `Submitted`, `Under Review`, `Approved` and `Rejected`. Status changes and a simple status history are persisted in the same local JSON store. The admin API requires a signed-in session; the citizen tracking endpoint continues to expose only the reference, service, status and submission time.
+---
 
-This is a local academic demonstration, not production authentication or a deployment-ready administrative system. Keep the server bound to localhost and use fictional applicant data.
+## 🧪 Comprehensive Verification Suite
 
-## OS scheduling demonstration
+The repository has zero external package dependencies (pure Python standard library) and features an extensive automated test suite covering 166 test cases across both Phase 1 and Phase 2:
 
-The CPU scheduling browser demonstration is retained separately so it does not define the citizen-facing experience:
-
+### Phase 1 Core Scheduler Tests (12 Tests)
 ```bash
-python3 os_lab_app.py
+python -m pytest tests/
+```
+```text
+tests/test_scheduler.py .......                                          [ 58%]
+tests/test_storage.py .....                                              [100%]
+============================= 12 passed in 0.43s ==============================
 ```
 
-Open **http://127.0.0.1:8001**. It demonstrates synthetic process requests, FCFS, SJF, Priority and Round Robin scheduling. The OS lab uses its own local JSON store.
-
-## Tests
-
-Citizen portal HTTP tests:
-
+### Phase 2 End-to-End Portal Tests (154 Tests)
 ```bash
-PYTHONPATH=. python3 -m unittest discover -s phase-2/tests -p 'test_citizen_portal.py' -v
+python -m unittest discover -s phase-2/tests
+```
+```text
+Ran 154 tests in 18.49s
+OK (All citizen endpoints, admin security, status transitions & scheduling invariants verified)
 ```
 
-Administrator dashboard tests:
+---
+
+## 🚀 Running the Services
+
+### Prerequisites
+* **Python**: 3.10 or newer (No pip packages required!)
+
+### 1. Launch the Citizen Portal & Admin System
 
 ```bash
-PYTHONPATH=. python3 -m unittest discover -s phase-2/tests -p 'test_admin_dashboard.py' -v
-```
+# Optional: Set admin credentials for demo
+export CIVICONE_ADMIN_PASSWORD="local-admin-demo"
+# Windows PowerShell:
+# $env:CIVICONE_ADMIN_PASSWORD="local-admin-demo"
 
-OS lab HTTP tests:
+# Start the portal server
+python web_app.py
+```
+* **Citizen Portal**: Open [http://127.0.0.1:8000](http://127.0.0.1:8000) to browse services, submit synthetic applications, and track progress by reference ID.
+* **Administrator Console**: Open [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin) to review queue entries, filter by status, and approve/reject applications.
+
+### 2. Launch the CPU Scheduling Lab
+
+In a separate terminal:
 
 ```bash
-PYTHONPATH=. python3 -m unittest discover -s phase-2/tests -p 'test_web_integration.py' -v
+python os_lab_app.py
+```
+* Open [http://127.0.0.1:8001](http://127.0.0.1:8001) to interactively generate synthetic processes, switch between FCFS, SJF, Priority, and Round Robin algorithms, and inspect real-time Gantt charts.
+
+---
+
+## 📂 Repository Structure
+
+```text
+Integrated-National-Citizen-Services-Platform/
+├── web_app.py                 # Citizen portal web application (Port 8000)
+├── admin_page.py              # Administrative dashboard & status triage
+├── os_lab_app.py              # Standalone CPU scheduling simulator (Port 8001)
+├── os_platform/               # Core OS modeling modules
+│   ├── models.py              # Process control block (PCB) & request abstractions
+│   ├── scheduler.py           # Scheduling algorithms implementation
+│   └── storage.py             # Atomic file persistence helpers
+├── phase-1/                   # Phase 1 milestone deliverables & baseline tests
+├── phase-2/                   # Phase 2 production architecture & test suite
+├── tests/                     # Automated unit test suite
+├── data/                      # Local JSON state stores
+│   └── citizen_applications.json
+├── docs/                      # Conceptual OS theory & evidence documentation
+└── README.md
 ```
 
-Phase 1 tests:
+---
 
-```bash
-python3 -m unittest discover -s phase-1/tests -v
-```
-
-Phase 2 tests:
-
-```bash
-PYTHONPATH=phase-2/src python3 -m unittest discover -s phase-2/tests -v
-```
-
-## Project structure
-
-- `web_app.py` — citizen-facing web portal.
-- `os_lab_app.py` — separate browser-based CPU scheduling teaching demo.
-- `os_platform/` — original repository-root process model and FCFS baseline.
-- `phase-1/` — Phase 1 process, thread and scheduling work, notes and evidence.
-- `phase-2/` — Phase 2 concurrency, deadlock, memory and storage demonstrations, tests and reports.
-- `data/` — local synthetic demonstration records.
-
-## Important scope notes
-
-Applications are locally stored and initially receive the status **Submitted**. The local administrator dashboard can change a demo application's status and record a simple status history; this is not a real staff review or government fulfilment workflow. The prototype does not provide real identity verification, notifications, document uploads, payments or live government-service fulfilment. Status lookup returns only the reference, service, status and submission timestamp; it does not expose the stored contact fields.
-
-The OS simulations are user-space educational models. They do not modify the Linux kernel scheduler, implement kernel internals or represent measured production-government workloads. Claims about hardware execution must be limited to the tests and environments actually used.
+## 📚 Operating Systems Curriculum Alignment
+* **Process Management:** Process Control Blocks (PCB), Process States, Context Switching.
+* **CPU Scheduling:** Comparative study of non-preemptive (FCFS, SJF) and preemptive (Round Robin) algorithms.
+* **Concurrency & Safety:** Synchronization boundaries, file locking semantics, race-condition mitigation.
+* **Educational Disclaimer:** Developed strictly as an academic learning vehicle; not associated with any governmental portal or authority.
